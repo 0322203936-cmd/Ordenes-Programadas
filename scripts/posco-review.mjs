@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { chromium, expect } from 'playwright';
+import { chromium } from 'playwright';
 import XLSX from 'xlsx';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -143,7 +143,11 @@ try {
   await screenshot(page, '03-archivo-cargado.png');
   const uploadButton = modal.getByRole('button', { name: /^Upload$/i });
   await uploadButton.waitFor({ state: 'visible', timeout: 15000 });
-  await expect(uploadButton).toBeEnabled({ timeout: 15000 });
+  const enabledUntil = Date.now() + 15000;
+  while (!(await uploadButton.isEnabled())) {
+    if (Date.now() >= enabledUntil) throw new Error('El botón Upload no se habilitó después de seleccionar el archivo y el formato.');
+    await page.waitForTimeout(250);
+  }
   await uploadButton.click();
   await page.waitForTimeout(8000);
   await screenshot(page, '04-revision-posco.png');
