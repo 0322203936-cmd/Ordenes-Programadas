@@ -5,3 +5,7 @@ node_modules/
 *.log
 dist/
 artifacts/
+
+# server PC: logs and stop requests (tools/servidor.ps1)
+logs/
+data/
