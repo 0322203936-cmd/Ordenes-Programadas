@@ -103,10 +103,10 @@ async function loginToPosco(page) {
 async function openOrdersSection(page) {
   await clickVisibleText(page, 'Ordenes');
   await page.waitForTimeout(800);
-  const route = page.locator('a[href="#/list-orden-detalle"]:visible').first();
+  const route = page.locator('a[href="#/revisar-ordenes"]:visible').first();
   await route.waitFor({ state: 'visible', timeout: 15000 });
   await route.click({ timeout: 15000 });
-  await page.waitForURL('**/#/list-orden-detalle', { timeout: 30000 }).catch(() => {});
+  await page.waitForURL('**/#/revisar-ordenes', { timeout: 30000 }).catch(() => {});
   await page.waitForTimeout(2500);
 }
 
@@ -127,9 +127,7 @@ try {
   await openOrdersSection(page);
   await screenshot(page, '02-ordenes.png');
 
-  // Revisar Archivo está dentro del menú desplegable de Órdenes.
-  await clickVisibleText(page, 'Ordenes');
-  await page.waitForTimeout(500);
+  // En esta ruta el botón Revisar Archivo pertenece al módulo Revisar Órdenes.
   await clickVisibleText(page, 'Revisar Archivo');
   const modal = page.locator('app-modal').filter({ hasText: 'Import excel' });
   const fileInput = modal.locator('input[type="file"]');
