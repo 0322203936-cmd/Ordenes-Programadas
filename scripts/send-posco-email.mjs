@@ -84,16 +84,19 @@ const sender = clean(process.env.POSCO_ORDER_SENDER || process.env.MAIL_SENDER) 
 const recipients = parseRecipients();
 const token = await graphToken();
 
-const body = `<p>Hola,</p>`
-  + `<p>Se cargaron y actualizaron correctamente en POSCO las órdenes recurrentes programadas.</p>`
-  + `<p><strong>Load Dates procesadas:</strong> ${htmlEscape(loadDates)}<br>`
-  + `<strong>Órdenes cargadas:</strong> ${activeOrders.length}</p>`
-  + '<p>El siguiente ciclo quedó registrado automáticamente para evitar duplicados.</p>'
+const body = `<p>Hola equipo,</p>`
+  + `<p>La actualización automática de las órdenes recurrentes se completó correctamente en POSCO.</p>`
+  + `<p>Adjunto encontrarán el archivo utilizado para la carga.</p>`
+  + `<p><strong>Resumen de la actualización:</strong><br>`
+  + `• Load Dates procesadas: <strong>${htmlEscape(loadDates)}</strong><br>`
+  + `• Órdenes cargadas: <strong>${activeOrders.length}</strong><br>`
+  + '• Estado: <strong>Actualizado correctamente</strong></p>'
+  + '<p>El siguiente ciclo quedó programado automáticamente y el registro se actualizó para evitar duplicados.</p>'
   + '<p>Saludos.</p>';
 
 const payload = {
   message: {
-    subject: `Órdenes recurrentes actualizadas en POSCO - ${loadDates}`,
+    subject: `Confirmación de carga POSCO - Órdenes recurrentes - ${loadDates}`,
     body: { contentType: 'HTML', content: body },
     toRecipients: recipients.map(({ address }) => ({ emailAddress: { address } })),
     ccRecipients: [],
