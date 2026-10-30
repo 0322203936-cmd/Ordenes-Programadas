@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { chromium } from 'playwright';
+import { chromium, expect } from 'playwright';
 import XLSX from 'xlsx';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -141,7 +141,10 @@ try {
   }
   console.log(`Archivo cargado y formato seleccionado: ${selectedMode}.`);
   await screenshot(page, '03-archivo-cargado.png');
-  await modal.getByRole('button', { name: /^Upload$/i }).click();
+  const uploadButton = modal.getByRole('button', { name: /^Upload$/i });
+  await uploadButton.waitFor({ state: 'visible', timeout: 15000 });
+  await expect(uploadButton).toBeEnabled({ timeout: 15000 });
+  await uploadButton.click();
   await page.waitForTimeout(8000);
   await screenshot(page, '04-revision-posco.png');
   console.log('POSCO quedó en revisión. No se pulsó Actualizar.');
