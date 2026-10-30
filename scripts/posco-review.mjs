@@ -68,6 +68,48 @@ async function screenshot(page, name) {
   await page.screenshot({ path: resolve(outputDir, name), fullPage: true });
 }
 
+async function clickVisibleText(page, value) {
+  const candidates = [
+    page.getByRole('button', { name: value, exact: true }),
+    page.getByRole('link', { name: value, exact: true }),
+    page.getByText(value, { exact: true })
+  ];
+  for (const candidate of candidates) {
+    for (let index = 0; index < await candidate.count(); index += 1) {
+      const element = candidate.nth(index);
+      if (await element.isVisible()) {
+        await element.click({ timeout: 15000 });
+        return;
+      }
+    }
+  }
+  throw new Error(`No se encontró el control visible ${value} en POSCO.`);
+}
+
+async function loginToPosco(page) {
+  const userInput = page.locator('input[placeholder*="usuario@email.com" i], input[type="text"]').first();
+  const passwordInput = page.locator('input[placeholder*="Password" i], input[type="password"]').first();
+  await userInput.waitFor({ state: 'visible', timeout: 60000 });
+  await passwordInput.waitFor({ state: 'visible', timeout: 60000 });
+  await userInput.fill(poscoUser);
+  await passwordInput.fill(poscoPassword);
+  await clickVisibleText(page, 'Iniciar Sesión');
+  await page.waitForLoadState('networkidle', { timeout: 60000 }).catch(() => {});
+  await passwordInput.waitFor({ state: 'hidden', timeout: 30000 }).catch(() => {});
+  await page.waitForTimeout(2000);
+  console.log('Sesión POSCO iniciada.');
+}
+
+async function openOrdersSection(page) {
+  await clickVisibleText(page, 'Ordenes');
+  await page.waitForTimeout(800);
+  const route = page.locator('a[href="#/list-orden-detalle"]:visible').first();
+  await route.waitFor({ state: 'visible', timeout: 15000 });
+  await route.click({ timeout: 15000 });
+  await page.waitForURL('**/#/list-orden-detalle', { timeout: 30000 }).catch(() => {});
+  await page.waitForTimeout(2500);
+}
+
 await mkdir(outputDir, { recursive: true });
 const orders = JSON.parse(await readFile(ordersPath, 'utf8'));
 const workbook = buildWorkbook(orders);
@@ -81,18 +123,8 @@ try {
   await page.goto(poscoUrl, { waitUntil: 'domcontentloaded', timeout: 120000 });
   await screenshot(page, '01-posco-inicio.png');
 
-  const userInput = page.locator('input[placeholder*="usuario@email.com" i], input[type="text"]').first();
-  const passwordInput = page.locator('input[placeholder*="Password" i], input[type="password"]').first();
-  if (await userInput.count()) {
-    await userInput.fill(poscoUser);
-    await passwordInput.fill(poscoPassword);
-    await page.getByRole('button', { name: /Iniciar Sesión/i }).click();
-  }
-  await page.waitForLoadState('networkidle', { timeout: 120000 }).catch(() => {});
-  const ordersLink = page.locator('a[href="#/list-orden-detalle"]').first();
-  if (await ordersLink.count()) await ordersLink.click();
-  else await page.getByText('Ordenes', { exact: true }).first().click();
-  await page.waitForTimeout(1500);
+  await loginToPosco(page);
+  await openOrdersSection(page);
   await screenshot(page, '02-ordenes.png');
 
   await page.getByRole('button', { name: /Revisar Archivo/i }).click();
