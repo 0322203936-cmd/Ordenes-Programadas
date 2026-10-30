@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ordenes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="shell container-fluid">
+    <div class="compact-actions">
+      <button class="button ghost" id="downloadFormat" type="button">Descargar Formato</button>
+      <button class="button primary" id="executeOrders" type="button">Ejecutar órdenes</button>
+      <button class="button primary" id="newOrder" type="button">+ Nueva orden</button>
+    </div>
+
+    <section class="table-panel">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Estado</th><th>Cliente</th><th>Ejecución</th><th>Load Date</th><th>Flor / descripción</th><th>Cajas</th><th>Pack</th><th>Stems</th><th>Vigencia</th><th></th></tr></thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty" hidden>No hay órdenes que coincidan con la búsqueda.</div>
+    </section>
+
+    <section class="panel upcoming">
+      <div class="section-heading"><div><h2>Próximas 3 semanas</h2><p>Vista previa de lo que se generaría en cada ciclo.</p></div></div>
+      <div id="upcomingWeeks" class="weeks-grid"></div>
+    </section>
+
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <dialog id="orderDialog">
+    <form method="dialog" id="orderForm" class="form-card">
+      <div class="dialog-head"><div><p class="eyebrow">ORDEN RECURRENTE</p><h2 id="dialogTitle">Nueva orden</h2><p class="dialog-subtitle">Define qué se repetirá cada semana.</p></div><button class="close" id="closeDialog" type="button" aria-label="Cerrar">×</button></div>
+      <input id="orderId" type="hidden">
+      <div class="form-section">
+        <div class="form-section-title"><span>1</span><div><h3>Datos POSCO</h3><p>Información que llevará la orden automática.</p></div></div>
+        <div class="form-grid">
+          <label>Distribuidor<input id="distributor" value="PACIFICA PRODUCE FARMS" readonly></label>
+          <label>Cliente<input id="client" required placeholder="Ej. Allan Flowers"></label>
+          <label>Cust Name<input id="customer" value="WHOLESALE" readonly></label>
+          <label>Descripción<input id="description" required placeholder="Ej. 1 x 15 Matricaria Daisy"></label>
+          <label>No. <span class="optional">automático</span><input id="orderNo" readonly placeholder="Se genera con Cliente y Load Date"></label>
+          <label>Flor<input id="flower" required placeholder="Ej. Matricaria"></label>
+          <label>Cajas<input id="boxes" type="number" min="1" step="1" required></label>
+          <label>Pack<input id="pack" placeholder="Ej. 16"></label>
+          <label>Stems<input id="stems" type="number" min="1" step="1" required></label>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title"><span>2</span><div><h3>Programación</h3><p>Define cuándo debe generarse.</p></div></div>
+        <div class="form-grid schedule-grid">
+          <label>Día de ejecución<select id="executionWeekday"><option>Lunes</option><option selected>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option><option>Sábado</option></select></label>
+          <label>Día de Load Date<select id="loadWeekday"><option>Lunes</option><option>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option></select></label>
+          <label>Primera fecha de Load Date<input id="startDate" type="date" required></label>
+          <label>Fecha de producción <span class="optional">Load Date − 2 días</span><input id="productionDate" type="date" readonly></label>
+          <label>Fecha final <span class="optional">opcional</span><input id="endDate" type="date"></label>
+          <label class="switch-field"><input id="active" type="checkbox"><span class="switch-ui"></span><span><b>Orden activa</b><small>Se incluirá en el siguiente ciclo.</small></span></label>
+        </div>
+      </div>
+      <div class="dialog-actions"><button class="button ghost" id="cancelOrder" type="button">Cancelar</button><button class="button primary" id="saveOrder" type="submit">Guardar orden</button></div>
+    </form>
+  </dialog>
+  <script src="./app.js" defer></script>
+</body>
+</html>
