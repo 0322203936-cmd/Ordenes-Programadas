@@ -1,5 +1,5 @@
 import { createServer } from 'node:http';
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
@@ -93,12 +93,43 @@ async function dispatchPoscoWorkflow(orders) {
   return { runId, updatedOrders };
 }
 
+// The orders everyone sees: data/orders.json (kept on this computer, not in git);
+// until the first save it starts from the repository's orders.json
+const sharedOrdersFile = join(root, 'data', 'orders.json');
+async function readSharedOrders() {
+  try { return JSON.parse(await readFile(sharedOrdersFile, 'utf8')); } catch {}
+  return JSON.parse(await readFile(join(root, 'orders.json'), 'utf8'));
+}
+async function writeSharedOrders(orders) {
+  await mkdir(join(root, 'data'), { recursive: true });
+  await writeFile(sharedOrdersFile, `${JSON.stringify(orders, null, 2)}\n`, 'utf8');
+}
+function sendJson(res, status, data) {
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+  res.end(JSON.stringify(data));
+}
+
 createServer(async (req, res) => {
-  if (req.method === 'POST' && (req.url || '').split('?')[0] === '/api/execute-orders') {
+  const apiPath = (req.url || '').split('?')[0];
+  if (apiPath === '/api/orders' && req.method === 'GET') {
+    try { sendJson(res, 200, await readSharedOrders()); } catch (error) { sendJson(res, 500, { error: error.message }); }
+    return;
+  }
+  if (apiPath === '/api/orders' && req.method === 'PUT') {
+    try {
+      const payload = await readJsonBody(req);
+      if (!Array.isArray(payload.orders)) throw new Error('Órdenes inválidas.');
+      await writeSharedOrders(payload.orders);
+      sendJson(res, 200, { ok: true });
+    } catch (error) { sendJson(res, 400, { error: error.message }); }
+    return;
+  }
+  if (req.method === 'POST' && apiPath === '/api/execute-orders') {
     try {
       const payload = await readJsonBody(req);
       if (!Array.isArray(payload.orders) || payload.orders.length === 0) throw new Error('No hay órdenes para ejecutar.');
       const result = await dispatchPoscoWorkflow(payload.orders);
+      await writeSharedOrders(result.updatedOrders);
       res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
       res.end(JSON.stringify({ ok: true, runId: result.runId, orders: result.updatedOrders, message: 'POSCO actualizó las órdenes y el ciclo fue registrado.' }));
     } catch (error) {

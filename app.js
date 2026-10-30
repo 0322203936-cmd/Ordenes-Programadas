@@ -24,7 +24,24 @@ function loadOrders() {
     return Array.isArray(saved) ? saved.map(normalizeOrder) : structuredClone(demoOrders);
   } catch { return structuredClone(demoOrders); }
 }
-function saveOrders() { localStorage.setItem(STORAGE_KEY, JSON.stringify(orders)); }
+// the orders live on the server (everyone sees the same ones); the browser keeps a copy in case it is offline
+function saveOrders() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+  fetch('/api/orders', { method:'PUT', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ orders }) })
+    .then(r => { if (!r.ok) throw new Error(); })
+    .catch(() => alert('No se pudo guardar en el servidor. Revisa la conexión e intenta de nuevo.'));
+}
+async function loadServerOrders() {
+  try {
+    const response = await fetch('/api/orders', { cache:'no-store' });
+    if (!response.ok) return;
+    const saved = await response.json();
+    if (!Array.isArray(saved)) return;
+    orders = saved.map(normalizeOrder);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    render();
+  } catch {}
+}
 function loadRuns() { try { const saved = JSON.parse(localStorage.getItem(RUNS_KEY)); return saved && typeof saved === 'object' ? saved : {}; } catch { return {}; } }
 function saveRuns(runs) { localStorage.setItem(RUNS_KEY, JSON.stringify(runs)); }
 function esc(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
@@ -167,3 +184,4 @@ $('orderForm').addEventListener('submit', (event) => {
   saveOrders(); $('orderDialog').close(); render();
 });
 render();
+loadServerOrders();
