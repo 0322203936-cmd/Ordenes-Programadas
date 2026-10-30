@@ -89,7 +89,9 @@ try {
     await page.getByRole('button', { name: /Iniciar Sesión/i }).click();
   }
   await page.waitForLoadState('networkidle', { timeout: 120000 }).catch(() => {});
-  await page.getByText('Ordenes', { exact: true }).first().click();
+  const ordersLink = page.locator('a[href="#/list-orden-detalle"]').first();
+  if (await ordersLink.count()) await ordersLink.click();
+  else await page.getByText('Ordenes', { exact: true }).first().click();
   await page.waitForTimeout(1500);
   await screenshot(page, '02-ordenes.png');
 
