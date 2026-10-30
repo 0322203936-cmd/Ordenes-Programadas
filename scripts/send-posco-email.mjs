@@ -78,6 +78,7 @@ const orders = JSON.parse(await readFile(resolve(root, 'orders-used.json'), 'utf
 const execution = JSON.parse(await readFile(resolve(root, 'execution-log.json'), 'utf8'));
 const workbookName = 'POSCO Wholesale - Ordenes recurrentes.xlsx';
 const workbook = await readFile(resolve(root, 'artifacts', workbookName));
+const logo = await readFile(resolve(root, 'assets', 'pacifica-farms-logo.jpg'));
 const loadDates = Array.isArray(execution.loadDates) ? execution.loadDates.join(', ') : 'N/D';
 const activeOrders = orders.filter((order) => order.active !== false && order.startDate);
 const sender = clean(process.env.POSCO_ORDER_SENDER || process.env.MAIL_SENDER) || 'noreply@cfbc.co';
@@ -92,7 +93,8 @@ const body = `<p>Hola equipo,</p>`
   + `• Órdenes cargadas: <strong>${activeOrders.length}</strong><br>`
   + '• Estado: <strong>Actualizado correctamente</strong></p>'
   + '<p>El siguiente ciclo quedó programado.</p>'
-  + '<p>Saludos.</p>';
+  + '<p>Saludos.</p>'
+  + '<p><img src="cid:pacifica-farms-logo" alt="Pacifica Farms" width="180" style="display:block;width:180px;height:auto;"></p>';
 
 const payload = {
   message: {
@@ -105,7 +107,11 @@ const payload = {
       workbookName,
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       workbook
-    )]
+    ), {
+      ...fileAttachment('pacifica-farms-logo.jpg', 'image/jpeg', logo),
+      isInline: true,
+      contentId: 'pacifica-farms-logo'
+    }]
   },
   saveToSentItems: true
 };
