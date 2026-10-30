@@ -72,10 +72,44 @@ async function waitForWorkflow(runId) {
   throw new Error('El workflow de POSCO tardó más de 15 minutos y se canceló la espera.');
 }
 
-async function dispatchPoscoWorkflow(orders) {
+// ---- how far ahead orders can be loaded: weeks (cycles) go Tuesday..Monday; an execution loads at most
+// the NEXT cycle (e.g. on Friday 30/10 the loads of 06/11 and 09/11). Later loads wait for their week.
+const MS_DAY = 86400000;
+const isoPlus = (iso, days) => new Date(Date.parse(`${iso}T00:00:00Z`) + days * MS_DAY).toISOString().slice(0, 10);
+const cycleStart = (iso) => isoPlus(iso, -((new Date(`${iso}T00:00:00Z`).getUTCDay() - 2 + 7) % 7));
+const todayIso = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Tijuana' }).format(new Date());
+const loadLimit = () => isoPlus(cycleStart(todayIso()), 13); // last day (Monday) of the next cycle
+const fmt = (iso) => iso.split('-').reverse().join('/');
+function splitByWindow(orders) {
+  const limit = loadLimit();
+  const pending = orders.filter((order) => order.active !== false && order.startDate);
+  return { limit, now: pending.filter((order) => order.startDate <= limit), later: pending.filter((order) => order.startDate > limit) };
+}
+
+// keeps every order (paused ones, later ones) and replaces the processed ones; each order remembers
+// which loads went to POSCO and when (processedHistory, last 10)
+function mergeProcessed(shared, updated, startedAt) {
+  const byId = new Map(updated.map((order) => [order.id, order]));
+  const merged = shared.map((order) => byId.get(order.id) || order);
+  for (const order of updated) if (!shared.some((item) => item.id === order.id)) merged.push(order);
+  return merged.map((order) => {
+    if (!order.lastProcessedLoadDate || !order.lastProcessedAt || order.lastProcessedAt < startedAt) return order;
+    const history = (order.processedHistory || []).filter((entry) => entry.loadDate !== order.lastProcessedLoadDate);
+    history.push({ loadDate: order.lastProcessedLoadDate, at: order.lastProcessedAt });
+    return { ...order, processedHistory: history.slice(-10) };
+  });
+}
+
+async function dispatchPoscoWorkflow(incoming) {
   const ordersFile = join(root, 'orders.json');
+  const { limit, now: orders, later } = splitByWindow(incoming);
+  if (!orders.length) {
+    const next = later.map((order) => order.startDate).sort()[0];
+    throw new Error(`Ya se cargó todo lo de la próxima semana. La siguiente carga (${fmt(next)}) se podrá ejecutar a partir del martes ${fmt(isoPlus(cycleStart(next), -7))}.`);
+  }
   await syncLatestOrders();
   await rejectProcessedDuplicates(orders);
+  // the bot gets only what goes now; paused and later orders stay in the shared list
   await writeFile(ordersFile, `${JSON.stringify(orders, null, 2)}\n`, 'utf8');
   const git = process.platform === 'win32' ? 'git.exe' : 'git';
   const gh = process.platform === 'win32' ? 'gh.exe' : 'gh';
@@ -90,10 +124,16 @@ async function dispatchPoscoWorkflow(orders) {
   const startedAt = new Date().toISOString();
   await execFileAsync(gh, ['workflow', 'run', workflow, '--repo', repo, '--ref', 'master', '--field', 'orders_file=orders.json'], { cwd: root });
   const runId = await waitForWorkflowRun(startedAt);
-  await waitForWorkflow(runId);
+  let failure = null;
+  try { await waitForWorkflow(runId); } catch (error) { failure = error; }
   await syncLatestOrders();
   const updatedOrders = JSON.parse(await readFile(ordersFile, 'utf8'));
-  return { runId, updatedOrders };
+  // the workflow can fail AFTER POSCO was updated (e.g. the email): what was processed is kept anyway
+  const processed = updatedOrders.filter((order) => order.lastProcessedAt && order.lastProcessedAt >= startedAt);
+  if (failure && !processed.length) throw failure;
+  const merged = mergeProcessed(await readSharedOrders(), updatedOrders, startedAt);
+  await writeSharedOrders(merged);
+  return { runId, updatedOrders: merged, warning: failure ? `POSCO sí se actualizó, pero un paso posterior falló (${failure.message}). Revisa el correo de confirmación en GitHub Actions.` : null, limit };
 }
 
 // The orders everyone sees: data/orders.json (kept on this computer, not in git);
@@ -146,9 +186,8 @@ createServer(async (req, res) => {
       const payload = await readJsonBody(req);
       if (!Array.isArray(payload.orders) || payload.orders.length === 0) throw new Error('No hay órdenes para ejecutar.');
       const result = await dispatchPoscoWorkflow(payload.orders);
-      await writeSharedOrders(result.updatedOrders);
       res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
-      res.end(JSON.stringify({ ok: true, runId: result.runId, orders: result.updatedOrders, message: 'POSCO actualizó las órdenes y el ciclo fue registrado.' }));
+      res.end(JSON.stringify({ ok: true, runId: result.runId, orders: result.updatedOrders, warning: result.warning, message: 'POSCO actualizó las órdenes y el ciclo fue registrado.' }));
     } catch (error) {
       console.error('No se pudo enviar el workflow POSCO:', error);
       res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });

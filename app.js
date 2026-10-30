@@ -77,14 +77,28 @@ function render() {
     <td><div class="row-actions"><button class="icon-button" data-action="toggle" data-id="${o.id}">${o.active?'Pausar':'Activar'}</button><button class="icon-button" data-action="edit" data-id="${o.id}">Editar</button><button class="icon-button" data-action="delete" data-id="${o.id}">×</button></div></td>
   </tr>`).join('');
   $('emptyState').hidden = filtered.length > 0;
-  renderWeeks(orders.filter(o => o.active));
+  renderWeeks(orders);
 }
-function renderWeeks(active) {
+// when a load date of this order already went to POSCO (null if not)
+function loadedAt(order, iso) {
+  const history = [...(order.processedHistory || [])];
+  if (order.lastProcessedLoadDate && order.lastProcessedAt) history.push({ loadDate: order.lastProcessedLoadDate, at: order.lastProcessedAt });
+  const entry = history.find(item => item.loadDate === iso);
+  return entry ? new Date(entry.at) : null;
+}
+function renderWeeks(list) {
   const first = cycleStartOf(new Date());
+  const line = (o, note) => `<div class="week-line${note ? ' loaded' : ''}"><span>${esc(o.client)}<small>${esc(o.description || o.flower)}${note ? ` · <b>${note}</b>` : ''}</small></span><strong>${o.boxes} × ${o.stems}</strong></div>`;
   $('upcomingWeeks').innerHTML = [0,1,2].map(index => {
     const cycleStart = new Date(first); cycleStart.setDate(cycleStart.getDate()+index*7);
-    const lines = active.filter(o => activeAt(o,dateForDay(cycleStart,o.loadWeekday || o.weekday)));
-    return `<article class="week-card"><h3>${index===0?'Semana actual':index===1?'Próxima semana':'En 2 semanas'}</h3><div class="week-date">${formatDate(cycleStart.toISOString().slice(0,10))} al ${formatDate(new Date(cycleStart.getTime()+6*86400000).toISOString().slice(0,10))}</div>${lines.length ? lines.map(o=>`<div class="week-line"><span>${esc(o.client)}<small>${esc(o.description || o.flower)}</small></span><strong>${o.boxes} × ${o.stems}</strong></div>`).join('') : '<div class="week-date">Sin órdenes activas</div>'}</article>`;
+    const lines = [];
+    for (const o of list) {
+      const day = dateForDay(cycleStart, o.loadWeekday || o.weekday);
+      const loaded = loadedAt(o, localIso(day));
+      if (loaded) lines.push(line(o, `✓ Cargado en POSCO el ${formatDate(localIso(loaded))}`));
+      else if (activeAt(o, day)) lines.push(line(o, ''));
+    }
+    return `<article class="week-card"><h3>${index===0?'Semana actual':index===1?'Próxima semana':'En 2 semanas'}</h3><div class="week-date">${formatDate(cycleStart.toISOString().slice(0,10))} al ${formatDate(new Date(cycleStart.getTime()+6*86400000).toISOString().slice(0,10))}</div>${lines.length ? lines.join('') : '<div class="week-date">Sin órdenes activas</div>'}</article>`;
   }).join('');
 }
 function updateDerivedFields() {
@@ -110,9 +124,30 @@ function openForm(order) {
   updateDerivedFields();
   $('orderDialog').showModal();
 }
+// ---- how far ahead orders can be loaded (same rule as server.mjs): weeks go Tuesday..Monday and an
+// execution loads at most the NEXT week; later loads wait for their week
+const isoPlus = (iso, days) => new Date(Date.parse(`${iso}T00:00:00Z`) + days * 86400000).toISOString().slice(0,10);
+const isoCycleStart = (iso) => isoPlus(iso, -((new Date(`${iso}T00:00:00Z`).getUTCDay() - 2 + 7) % 7));
+const localIso = (date) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+function loadWindow(list) {
+  const limit = isoPlus(isoCycleStart(localIso(new Date())), 13);
+  const pending = list.filter(order => order.active && order.startDate);
+  return { now: pending.filter(order => order.startDate <= limit), later: pending.filter(order => order.startDate > limit) };
+}
+function countByDate(list) {
+  const byDate = {};
+  for (const order of list) byDate[order.startDate] = (byDate[order.startDate] || 0) + 1;
+  return Object.keys(byDate).sort().map(date => `${byDate[date]} para el ${formatDate(date)}`).join(', ');
+}
 async function executeOrders() {
-  const pendingOrders = orders.filter(order => order.active && order.startDate);
-  if (!pendingOrders.length) return alert('No hay órdenes activas listas para ejecutar.');
+  const { now: pendingOrders, later } = loadWindow(orders);
+  if (!pendingOrders.length) {
+    if (!later.length) return alert('No hay órdenes activas listas para ejecutar.');
+    const next = later.map(order => order.startDate).sort()[0];
+    return alert(`Ya se cargó todo lo de la próxima semana.\n\nLa siguiente carga (${formatDate(next)}) se podrá ejecutar a partir del martes ${formatDate(isoPlus(isoCycleStart(next), -7))}.`);
+  }
+  const waiting = later.length ? `\n\n${later.length} orden(es) más adelante se quedan para su semana (${countByDate(later)}).` : '';
+  if (!confirm(`Se van a cargar ${pendingOrders.length} órdenes REALES a POSCO: ${countByDate(pendingOrders)}.\n\nTambién se enviará el correo de confirmación.${waiting}\n\n¿Continuar?`)) return;
   const button = $('executeOrders');
   button.disabled = true;
   button.textContent = 'Procesando en POSCO...';
@@ -125,11 +160,13 @@ async function executeOrders() {
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || 'No se pudo iniciar GitHub Actions.');
     if (Array.isArray(result.orders)) {
-      orders = result.orders.map(normalizeOrder);
-      saveOrders();
+      orders = result.orders.map(normalizeOrder); // the server already saved them
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
       render();
     }
-    alert(`POSCO actualizó las órdenes correctamente. El ciclo quedó registrado y las fechas avanzaron 7 días. Run: ${result.runId || 'completado'}`);
+    alert(result.warning
+      ? `${result.warning}\n\nLas fechas sí avanzaron 7 días. Run: ${result.runId || ''}`
+      : `POSCO actualizó las órdenes correctamente. El ciclo quedó registrado y las fechas avanzaron 7 días. Run: ${result.runId || 'completado'}`);
   } catch (error) {
     alert(`No se pudo ejecutar el bot: ${error.message}`);
   } finally {

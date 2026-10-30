@@ -45,3 +45,4 @@ dialog { width:min(820px,calc(100% - 30px)); border-radius:14px; }
 .switch-field b { display:block; color:var(--ink); font-size:11px; }
 .switch-field small { display:block; color:var(--muted); font-size:10px; font-weight:400; }
 .dialog-actions { margin-top:20px; padding-top:13px; border-top:1px solid var(--line); }
+.week-line.loaded { opacity:.75; } .week-line.loaded b { color:#1a7f37; font-weight:700; }
