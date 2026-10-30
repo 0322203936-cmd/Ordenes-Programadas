@@ -74,7 +74,7 @@ function fileAttachment(name, contentType, buffer) {
   };
 }
 
-const orders = JSON.parse(await readFile(resolve(root, 'orders-used.json'), 'utf8'));
+const orders = JSON.parse(await readFile(resolve(root, 'artifacts', 'orders-used.json'), 'utf8'));
 const execution = JSON.parse(await readFile(resolve(root, 'execution-log.json'), 'utf8'));
 const workbookName = 'POSCO Wholesale - Ordenes recurrentes.xlsx';
 const workbook = await readFile(resolve(root, 'artifacts', workbookName));

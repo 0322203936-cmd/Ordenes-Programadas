@@ -1,0 +1,52 @@
+name: POSCO - Reenviar confirmación por correo
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'ID de la ejecución POSCO que ya terminó correctamente'
+        required: true
+        type: string
+      artifact_name:
+        description: 'Nombre del artefacto de esa ejecución'
+        required: true
+        default: posco-review-6
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  email:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SHAREPOINT_TENANT_ID: ${{ secrets.SHAREPOINT_TENANT_ID || secrets.GRAPH_TENANT_ID }}
+      SHAREPOINT_CLIENT_ID: ${{ secrets.SHAREPOINT_CLIENT_ID || secrets.GRAPH_CLIENT_ID }}
+      SHAREPOINT_CLIENT_SECRET: ${{ secrets.SHAREPOINT_CLIENT_SECRET || secrets.GRAPH_CLIENT_SECRET }}
+      POSCO_ORDER_SENDER: noreply@cfbc.co
+      POSCO_ORDER_RECIPIENTS: jesus.sandoval@cfbc.co;gaston.gutierrez@cfbc.co;Irene.Machain@Pacifica-farms.com;roberto.gomez@cfbc.co
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm install --no-audit --no-fund
+
+      - name: Recuperar artefacto de la ejecución POSCO
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.source_run_id }}
+
+      - name: Enviar correo de confirmación
+        run: node scripts/send-posco-email.mjs
