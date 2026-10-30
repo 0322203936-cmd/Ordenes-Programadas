@@ -4,6 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "posco:review": "node scripts/posco-review.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.56.1",
+    "xlsx": "^0.18.5"
   }
 }

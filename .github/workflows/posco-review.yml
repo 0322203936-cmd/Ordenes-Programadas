@@ -1,0 +1,49 @@
+name: POSCO - Revisar órdenes programadas
+
+on:
+  workflow_dispatch:
+    inputs:
+      orders_file:
+        description: 'Archivo JSON de órdenes dentro del repositorio'
+        required: false
+        default: orders.json
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      POSCO_USER: ${{ secrets.POSCO_USER }}
+      POSCO_PASSWORD: ${{ secrets.POSCO_PASSWORD }}
+      ORDERS_FILE: ${{ inputs.orders_file }}
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm install --no-audit --no-fund
+
+      - name: Instalar Chromium de Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Generar archivo y revisar en POSCO
+        run: npm run posco:review
+
+      - name: Guardar archivo y capturas de revisión
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: posco-review-${{ github.run_number }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 14

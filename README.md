@@ -17,4 +17,11 @@ Después abre `http://127.0.0.1:4170`.
 - Vista previa de tres semanas.
 - Guardado local en el navegador.
 
-La conexión con POSCO todavía no está implementada. Primero se revisa y ajusta este flujo.
+## Revisión en POSCO mediante GitHub Actions
+
+1. Usa **Exportar órdenes** para descargar el `orders.json` actual y reemplaza el archivo `orders.json` del repositorio.
+2. En el repositorio, agrega los secretos `POSCO_USER` y `POSCO_PASSWORD`.
+3. Abre `Actions` → `POSCO - Revisar órdenes programadas` → `Run workflow`.
+4. Descarga el artefacto `posco-review-*` para ver el Excel y las capturas.
+
+El workflow llega hasta la revisión de POSCO y se detiene antes de `Actualizar`. Todavía no registra la ejecución ni mueve fechas, para evitar duplicados mientras validamos el flujo.

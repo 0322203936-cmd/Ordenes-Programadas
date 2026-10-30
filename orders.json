@@ -1,0 +1,79 @@
+[
+  {
+    "client": "Operers",
+    "description": "1 x 15 Matricaria Daisy",
+    "flower": "Matricaria",
+    "boxes": 1,
+    "pack": "15",
+    "stems": 15,
+    "loadWeekday": "Viernes",
+    "startDate": "2026-11-06",
+    "active": true
+  },
+  {
+    "client": "Dr Delphinium",
+    "description": "3 x 15 Burgundy Snaps",
+    "flower": "Burgundy Snaps",
+    "boxes": 3,
+    "pack": "15",
+    "stems": 15,
+    "loadWeekday": "Viernes",
+    "startDate": "2026-11-06",
+    "active": true
+  },
+  {
+    "client": "Dr Delphinium",
+    "description": "2 x 10 Safflowers",
+    "flower": "Safflowers",
+    "boxes": 2,
+    "pack": "10",
+    "stems": 10,
+    "loadWeekday": "Viernes",
+    "startDate": "2026-11-06",
+    "active": true
+  },
+  {
+    "client": "Dr Delphinium",
+    "description": "3 x 10 Marigold Orange",
+    "flower": "Marigold",
+    "boxes": 3,
+    "pack": "10",
+    "stems": 10,
+    "loadWeekday": "Viernes",
+    "startDate": "2026-11-06",
+    "active": true
+  },
+  {
+    "client": "Allan Flowers",
+    "description": "2 x 15 Matricaria",
+    "flower": "Matricaria",
+    "boxes": 2,
+    "pack": "15",
+    "stems": 15,
+    "loadWeekday": "Lunes",
+    "startDate": "2026-11-02",
+    "active": true
+  },
+  {
+    "client": "Allan Flowers",
+    "description": "3 x 15 Matricaria",
+    "flower": "Matricaria",
+    "boxes": 3,
+    "pack": "15",
+    "stems": 15,
+    "loadWeekday": "Viernes",
+    "startDate": "2026-11-06",
+    "active": true
+  },
+  {
+    "client": "Amy",
+    "description": "Veldkamps",
+    "flower": "Veldkamps",
+    "boxes": 1,
+    "pack": "15",
+    "stems": 15,
+    "loadWeekday": "Viernes",
+    "startDate": "2026-11-06",
+    "active": true
+  }
+]

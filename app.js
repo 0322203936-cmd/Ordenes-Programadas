@@ -145,9 +145,18 @@ function downloadFormat() {
   link.download = 'POSCO Wholesale - Formato.xlsx';
   document.body.appendChild(link); link.click(); link.remove();
 }
+function exportOrders() {
+  const blob = new Blob([JSON.stringify(orders, null, 2)], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'orders.json';
+  document.body.appendChild(link); link.click(); link.remove();
+  URL.revokeObjectURL(link.href);
+}
 
 $('newOrder').addEventListener('click',()=>openForm());
 $('downloadFormat').addEventListener('click', downloadFormat);
+$('exportOrders').addEventListener('click', exportOrders);
 $('executeOrders').addEventListener('click', executeOrders);
 $('closeDialog').addEventListener('click', () => $('orderDialog').close('cancel'));
 $('cancelOrder').addEventListener('click', () => $('orderDialog').close('cancel'));
