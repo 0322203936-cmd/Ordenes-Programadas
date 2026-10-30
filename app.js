@@ -139,8 +139,8 @@ async function executeOrders() {
 }
 function downloadFormat() {
   const link = document.createElement('a');
-  link.href = './Formato_POSCO_Wholesale.xlsx';
-  link.download = 'POSCO Wholesale - Formato.xlsx';
+  link.href = '/api/formato'; // filled with the active orders, as the bot uploads it
+  link.download = 'POSCO Wholesale - Ordenes recurrentes.xlsx';
   document.body.appendChild(link); link.click(); link.remove();
 }
 

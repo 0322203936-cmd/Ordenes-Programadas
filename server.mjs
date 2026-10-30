@@ -1,9 +1,12 @@
+import './scripts/utc.mjs';
 import { createServer } from 'node:http';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import XLSX from 'xlsx';
+import { buildWorkbook } from './scripts/posco-format.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 const port = Number(process.env.PORT || 4170);
@@ -113,6 +116,20 @@ createServer(async (req, res) => {
   const apiPath = (req.url || '').split('?')[0];
   if (apiPath === '/api/orders' && req.method === 'GET') {
     try { sendJson(res, 200, await readSharedOrders()); } catch (error) { sendJson(res, 500, { error: error.message }); }
+    return;
+  }
+  // the POSCO format filled with the active orders (the same file the bot uploads)
+  if (apiPath === '/api/formato' && req.method === 'GET') {
+    try {
+      const workbook = buildWorkbook(await readSharedOrders(), join(root, 'Formato_POSCO_Wholesale.xlsx'));
+      const body = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+      res.writeHead(200, {
+        'Content-Type': types['.xlsx'],
+        'Content-Disposition': `attachment; filename="POSCO Wholesale - Ordenes recurrentes.xlsx"`,
+        'Cache-Control': 'no-store'
+      });
+      res.end(body);
+    } catch (error) { sendJson(res, 400, { error: error.message }); }
     return;
   }
   if (apiPath === '/api/orders' && req.method === 'PUT') {
