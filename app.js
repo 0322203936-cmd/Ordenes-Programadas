@@ -94,50 +94,26 @@ function openForm(order) {
   $('orderDialog').showModal();
 }
 async function executeOrders() {
-  if (!window.XLSX) return alert('No se pudo cargar el generador de Excel. Recarga la página e inténtalo nuevamente.');
-  // Esta etapa solo prepara el archivo para cargarlo y revisarlo en POSCO.
-  // La ejecución no se registra aquí: el ciclo y las fechas solo deben avanzar
-  // después de que el bot confirme que POSCO terminó correctamente en Actualizar.
   const pendingOrders = orders.filter(order => order.active && order.startDate);
-  if (!pendingOrders.length) return alert('No hay órdenes activas listas para preparar.');
-  const response = await fetch('./Formato_POSCO_Wholesale.xlsx', { cache:'no-store' });
-  if (!response.ok) return alert('No se pudo cargar el formato POSCO.');
-  const workbook = XLSX.read(await response.arrayBuffer(), { type:'array', cellStyles:true, cellDates:true });
-  const sheet = workbook.Sheets['New Order'] || workbook.Sheets[workbook.SheetNames[0]];
-  const templateRow = 1;
-  const endColumn = 12;
-  const templateCells = Array.from({ length:endColumn + 1 }, (_, column) => sheet[XLSX.utils.encode_cell({ r:templateRow, c:column })] || {});
-  const toDate = (value) => value ? new Date(`${value}T00:00:00`) : '';
-  const rows = pendingOrders.map(order => [
-    DISTRIBUTOR,
-    'WHOLESALE',
-    order.description,
-    order.orderNo || buildOrderNo(order.client, order.startDate),
-    '',
-    order.flower,
-    '',
-    toDate(order.startDate),
-    order.boxes,
-    order.pack || '',
-    order.stems,
-    toDate(dateMinusDays(order.startDate, 2)),
-    ''
-  ]);
-  const maxRow = Math.max(1, rows.length);
-  for (let row = 1; row <= Math.max(sheet['!ref'] ? XLSX.utils.decode_range(sheet['!ref']).e.r : 1, maxRow); row++) {
-    for (let column = 0; column <= endColumn; column++) delete sheet[XLSX.utils.encode_cell({ r:row, c:column })];
+  if (!pendingOrders.length) return alert('No hay órdenes activas listas para ejecutar.');
+  const button = $('executeOrders');
+  button.disabled = true;
+  button.textContent = 'Enviando a GitHub...';
+  try {
+    const response = await fetch('/api/execute-orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orders: pendingOrders })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || 'No se pudo iniciar GitHub Actions.');
+    alert('Ordenes enviadas a GitHub Actions. Revisa el workflow y descarga el artefacto con las capturas de POSCO. No se presionará Actualizar.');
+  } catch (error) {
+    alert(`No se pudo ejecutar el bot: ${error.message}`);
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Ejecutar órdenes';
   }
-  rows.forEach((values, rowIndex) => values.forEach((value, column) => {
-    const template = templateCells[column];
-    const cell = { ...template, v:value };
-    if (value instanceof Date) cell.t = 'd';
-    else if (typeof value === 'number') cell.t = 'n';
-    else cell.t = 's';
-    sheet[XLSX.utils.encode_cell({ r:rowIndex + 1, c:column })] = cell;
-  }));
-  sheet['!ref'] = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:maxRow,c:endColumn} });
-  XLSX.writeFile(workbook, 'POSCO Wholesale - Ordenes recurrentes.xlsx');
-  alert('Archivo POSCO generado para revisión. Todavía no se registró la ejecución ni se movieron las fechas; eso ocurrirá después de confirmar Actualizar en POSCO.');
 }
 function downloadFormat() {
   const link = document.createElement('a');
