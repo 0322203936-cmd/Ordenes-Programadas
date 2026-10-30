@@ -133,7 +133,13 @@ try {
   const fileInput = modal.locator('input[type="file"]');
   await fileInput.setInputFiles(uploadPath);
   const mode = modal.locator('select[name="upload_mode"]');
-  if (await mode.count()) await mode.selectOption('pacifica2');
+  if (!(await mode.count())) throw new Error('No se encontró el selector Formato en el diálogo Import excel.');
+  await mode.selectOption('pacifica2');
+  const selectedMode = esc(await mode.locator('option:checked').textContent());
+  if (!/Pacifica\s*-\s*Andres Terriquez/i.test(selectedMode)) {
+    throw new Error(`Formato POSCO incorrecto: ${selectedMode || 'sin selección'}.`);
+  }
+  console.log(`Archivo cargado y formato seleccionado: ${selectedMode}.`);
   await screenshot(page, '03-archivo-cargado.png');
   await modal.getByRole('button', { name: /^Upload$/i }).click();
   await page.waitForTimeout(8000);
