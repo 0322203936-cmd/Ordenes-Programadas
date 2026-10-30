@@ -52,9 +52,9 @@ const delay = (milliseconds) => new Promise((resolveDelay) => setTimeout(resolve
 async function waitForWorkflowRun(startedAt) {
   const started = new Date(startedAt).getTime() - 2000;
   for (let attempt = 0; attempt < 30; attempt += 1) {
-    const runs = await ghJson(['run', 'list', '--workflow', workflow, '--repo', repo, '--event', 'workflow_dispatch', '--limit', '10', '--json', 'database,status,conclusion,createdAt']);
+    const runs = await ghJson(['run', 'list', '--workflow', workflow, '--repo', repo, '--event', 'workflow_dispatch', '--limit', '10', '--json', 'databaseId,status,conclusion,createdAt']);
     const run = runs.find((candidate) => new Date(candidate.createdAt).getTime() >= started);
-    if (run) return String(run.database);
+    if (run) return String(run.databaseId);
     await delay(2000);
   }
   throw new Error('GitHub Actions recibió la ejecución, pero no se pudo localizar su identificador.');
