@@ -127,7 +127,10 @@ try {
   await openOrdersSection(page);
   await screenshot(page, '02-ordenes.png');
 
-  await page.getByRole('button', { name: /Revisar Archivo/i }).click();
+  // Revisar Archivo está dentro del menú desplegable de Órdenes.
+  await clickVisibleText(page, 'Ordenes');
+  await page.waitForTimeout(500);
+  await clickVisibleText(page, 'Revisar Archivo');
   const modal = page.locator('app-modal').filter({ hasText: 'Import excel' });
   const fileInput = modal.locator('input[type="file"]');
   await fileInput.setInputFiles(uploadPath);
