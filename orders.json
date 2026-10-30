@@ -5,7 +5,7 @@
     "client": "Oberer´s Flowers Inc",
     "customer": "WHOLESALE",
     "description": "WS Matricaria White Daysi 10ST 15PK",
-    "orderNo": "Oberer´s Flowers Inc - 06/11/2026",
+    "orderNo": "Oberer´s Flowers Inc - 13/11/2026",
     "executionWeekday": "Martes",
     "loadWeekday": "Viernes",
     "weekday": "Viernes",
@@ -15,9 +15,11 @@
     "pack": "15",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-06",
+    "startDate": "2026-11-13",
     "endDate": "",
-    "active": true
+    "active": true,
+    "lastProcessedLoadDate": "2026-11-06",
+    "lastProcessedAt": "2026-10-30T16:50:56.884Z"
   },
   {
     "id": "003edc88-4289-4164-9fae-af78d33b16ff",
@@ -25,7 +27,7 @@
     "client": "Dr. Delphinium",
     "customer": "WHOLESALE",
     "description": "WS SNAPDRAGON BURGANDY 10 ST PK 15",
-    "orderNo": "Dr. Delphinium - 06/11/2026",
+    "orderNo": "Dr. Delphinium - 13/11/2026",
     "executionWeekday": "Martes",
     "loadWeekday": "Viernes",
     "weekday": "Viernes",
@@ -35,9 +37,11 @@
     "pack": "15",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-06",
+    "startDate": "2026-11-13",
     "endDate": "",
-    "active": true
+    "active": true,
+    "lastProcessedLoadDate": "2026-11-06",
+    "lastProcessedAt": "2026-10-30T16:50:56.884Z"
   },
   {
     "id": "9cc91d50-fb7b-4740-a743-e780ea2ec06e",
@@ -45,7 +49,7 @@
     "client": "Dr. Delphinium",
     "customer": "WHOLESALE",
     "description": "SAFFLOWER ORANGE 10st pk10",
-    "orderNo": "Dr. Delphinium - 06/11/2026",
+    "orderNo": "Dr. Delphinium - 13/11/2026",
     "executionWeekday": "Martes",
     "loadWeekday": "Viernes",
     "weekday": "Viernes",
@@ -55,9 +59,11 @@
     "pack": "10",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-06",
+    "startDate": "2026-11-13",
     "endDate": "",
-    "active": true
+    "active": true,
+    "lastProcessedLoadDate": "2026-11-06",
+    "lastProcessedAt": "2026-10-30T16:50:56.884Z"
   },
   {
     "id": "e9b48a6a-9871-4c23-8fbb-b98a7e10f7b7",
@@ -65,7 +71,7 @@
     "client": "Dr. Delphinium",
     "customer": "WHOLESALE",
     "description": "WS MARIGOLD ORANGE 5ST PK10",
-    "orderNo": "Dr. Delphinium - 06/11/2026",
+    "orderNo": "Dr. Delphinium - 13/11/2026",
     "executionWeekday": "Martes",
     "loadWeekday": "Viernes",
     "weekday": "Viernes",
@@ -75,9 +81,11 @@
     "pack": "10",
     "stems": 5,
     "boxType": "",
-    "startDate": "2026-11-06",
+    "startDate": "2026-11-13",
     "endDate": "",
-    "active": true
+    "active": true,
+    "lastProcessedLoadDate": "2026-11-06",
+    "lastProcessedAt": "2026-10-30T16:50:56.884Z"
   },
   {
     "id": "ec65b7da-e4bc-4fc6-8cdd-98d2d8a2d4a4",
@@ -85,7 +93,7 @@
     "client": "Allen Flowers and Plants - FTD",
     "customer": "WHOLESALE",
     "description": "WS Matricaria White Daysi 10ST 15PK",
-    "orderNo": "Allen Flowers and Plants - FTD - 09/11/2026",
+    "orderNo": "Allen Flowers and Plants - FTD - 16/11/2026",
     "executionWeekday": "Martes",
     "loadWeekday": "Lunes",
     "weekday": "Lunes",
@@ -95,9 +103,11 @@
     "pack": "15",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-09",
+    "startDate": "2026-11-16",
     "endDate": "",
-    "active": true
+    "active": true,
+    "lastProcessedLoadDate": "2026-11-09",
+    "lastProcessedAt": "2026-10-30T16:50:56.884Z"
   },
   {
     "id": "6e33ea33-460e-4145-9ad1-70e0eb1203e2",
@@ -105,7 +115,7 @@
     "client": "Allen Flowers and Plants - FTD",
     "customer": "WHOLESALE",
     "description": "WS Matricaria White Daysi 10ST 15PK",
-    "orderNo": "Allen Flowers and Plants - FTD - 06/11/2026",
+    "orderNo": "Allen Flowers and Plants - FTD - 13/11/2026",
     "executionWeekday": "Martes",
     "loadWeekday": "Viernes",
     "weekday": "Viernes",
@@ -115,8 +125,10 @@
     "pack": "15",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-06",
+    "startDate": "2026-11-13",
     "endDate": "",
-    "active": true
+    "active": true,
+    "lastProcessedLoadDate": "2026-11-06",
+    "lastProcessedAt": "2026-10-30T16:50:56.884Z"
   }
 ]
