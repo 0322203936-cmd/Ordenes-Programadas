@@ -10,7 +10,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   review:
@@ -38,6 +38,14 @@ jobs:
 
       - name: Generar archivo y revisar en POSCO
         run: npm run posco:review
+
+      - name: Registrar ciclo procesado
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add orders.json execution-log.json
+          git commit -m "Registra ordenes actualizadas en POSCO"
+          git push origin HEAD:master
 
       - name: Guardar archivo y capturas de revisión
         if: always()

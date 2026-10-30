@@ -8,6 +8,8 @@ import { promisify } from 'node:util';
 const root = fileURLToPath(new URL('.', import.meta.url));
 const port = Number(process.env.PORT || 4170);
 const execFileAsync = promisify(execFile);
+const repo = '0322203936-cmd/Ordenes-Programadas';
+const workflow = 'posco-review.yml';
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' };
 
 async function readJsonBody(req) {
@@ -19,8 +21,58 @@ async function readJsonBody(req) {
   return JSON.parse(body || '{}');
 }
 
+async function syncLatestOrders() {
+  const git = process.platform === 'win32' ? 'git.exe' : 'git';
+  await execFileAsync(git, ['pull', '--rebase', 'origin', 'master'], { cwd: root });
+}
+
+async function rejectProcessedDuplicates(incomingOrders) {
+  const current = JSON.parse(await readFile(join(root, 'orders.json'), 'utf8'));
+  const currentById = new Map(current.map((order) => [order.id, order]));
+  const duplicates = incomingOrders.filter((order) => {
+    const stored = currentById.get(order.id);
+    return stored && order.startDate && stored.startDate && stored.startDate > order.startDate;
+  });
+  if (duplicates.length) {
+    throw new Error(`Estas órdenes ya fueron procesadas para ${duplicates.map((order) => order.client || order.id).join(', ')}. Recarga la aplicación antes de ejecutar nuevamente.`);
+  }
+}
+
+async function ghJson(args) {
+  const gh = process.platform === 'win32' ? 'gh.exe' : 'gh';
+  const result = await execFileAsync(gh, args, { cwd: root });
+  return JSON.parse(result.stdout || 'null');
+}
+
+const delay = (milliseconds) => new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
+
+async function waitForWorkflowRun(startedAt) {
+  const started = new Date(startedAt).getTime() - 2000;
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    const runs = await ghJson(['run', 'list', '--workflow', workflow, '--repo', repo, '--event', 'workflow_dispatch', '--limit', '10', '--json', 'database,status,conclusion,createdAt']);
+    const run = runs.find((candidate) => new Date(candidate.createdAt).getTime() >= started);
+    if (run) return String(run.database);
+    await delay(2000);
+  }
+  throw new Error('GitHub Actions recibió la ejecución, pero no se pudo localizar su identificador.');
+}
+
+async function waitForWorkflow(runId) {
+  for (let attempt = 0; attempt < 180; attempt += 1) {
+    const run = await ghJson(['run', 'view', runId, '--repo', repo, '--json', 'status,conclusion']);
+    if (run.status === 'completed') {
+      if (run.conclusion !== 'success') throw new Error(`El workflow de POSCO terminó con estado: ${run.conclusion || 'falló'}.`);
+      return;
+    }
+    await delay(5000);
+  }
+  throw new Error('El workflow de POSCO tardó más de 15 minutos y se canceló la espera.');
+}
+
 async function dispatchPoscoWorkflow(orders) {
   const ordersFile = join(root, 'orders.json');
+  await syncLatestOrders();
+  await rejectProcessedDuplicates(orders);
   await writeFile(ordersFile, `${JSON.stringify(orders, null, 2)}\n`, 'utf8');
   const git = process.platform === 'win32' ? 'git.exe' : 'git';
   const gh = process.platform === 'win32' ? 'gh.exe' : 'gh';
@@ -32,7 +84,13 @@ async function dispatchPoscoWorkflow(orders) {
     if (!/nothing to commit|working tree clean/i.test(output)) throw error;
   }
   await execFileAsync(git, ['push', 'origin', 'master'], { cwd: root });
-  await execFileAsync(gh, ['workflow', 'run', 'posco-review.yml', '--repo', '0322203936-cmd/Ordenes-Programadas', '--ref', 'master', '--field', 'orders_file=orders.json'], { cwd: root });
+  const startedAt = new Date().toISOString();
+  await execFileAsync(gh, ['workflow', 'run', workflow, '--repo', repo, '--ref', 'master', '--field', 'orders_file=orders.json'], { cwd: root });
+  const runId = await waitForWorkflowRun(startedAt);
+  await waitForWorkflow(runId);
+  await syncLatestOrders();
+  const updatedOrders = JSON.parse(await readFile(ordersFile, 'utf8'));
+  return { runId, updatedOrders };
 }
 
 createServer(async (req, res) => {
@@ -40,9 +98,9 @@ createServer(async (req, res) => {
     try {
       const payload = await readJsonBody(req);
       if (!Array.isArray(payload.orders) || payload.orders.length === 0) throw new Error('No hay órdenes para ejecutar.');
-      await dispatchPoscoWorkflow(payload.orders);
-      res.writeHead(202, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
-      res.end(JSON.stringify({ ok: true, message: 'Workflow de POSCO enviado a GitHub Actions.' }));
+      const result = await dispatchPoscoWorkflow(payload.orders);
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+      res.end(JSON.stringify({ ok: true, runId: result.runId, orders: result.updatedOrders, message: 'POSCO actualizó las órdenes y el ciclo fue registrado.' }));
     } catch (error) {
       console.error('No se pudo enviar el workflow POSCO:', error);
       res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });

@@ -42,10 +42,10 @@ function nextScheduledLoadDate(executionDay, loadDay) {
   execution.setDate(execution.getDate() + loadOffset);
   return execution.toISOString().slice(0,10);
 }
-function cycleKey(order, date = new Date()) { return `${mondayOf(date).toISOString().slice(0,10)}|${order.executionWeekday || 'Martes'}`; }
+function cycleKey(order, date = new Date()) { return `${cycleStartOf(date).toISOString().slice(0,10)}|${order.executionWeekday || 'Martes'}`; }
 function datePlusDays(value, days) { const date = new Date(`${value}T00:00:00Z`); date.setUTCDate(date.getUTCDate() + days); return date.toISOString().slice(0,10); }
-function mondayOf(date) { const d = new Date(date); d.setHours(0,0,0,0); const diff = (d.getDay()+6)%7; d.setDate(d.getDate()-diff); return d; }
-function dateForDay(monday, weekday) { const offsets = {Lunes:0,Martes:1,Miércoles:2,Jueves:3,Viernes:4,Sábado:5,Domingo:6}; const d = new Date(monday); d.setDate(d.getDate() + (offsets[weekday] ?? 0)); return d; }
+function cycleStartOf(date) { const d = new Date(date); d.setHours(0,0,0,0); const diff = (d.getDay() - 2 + 7) % 7; d.setDate(d.getDate() - diff); return d; }
+function dateForDay(cycleStart, weekday) { const offsets = {Martes:0,Miércoles:1,Jueves:2,Viernes:3,Sábado:4,Domingo:5,Lunes:6}; const d = new Date(cycleStart); d.setDate(d.getDate() + (offsets[weekday] ?? 0)); return d; }
 function activeAt(order, date) { const iso = date.toISOString().slice(0,10); return order.active && order.startDate <= iso && (!order.endDate || order.endDate >= iso); }
 
 let orders = loadOrders();
@@ -63,11 +63,11 @@ function render() {
   renderWeeks(orders.filter(o => o.active));
 }
 function renderWeeks(active) {
-  const first = mondayOf(new Date());
+  const first = cycleStartOf(new Date());
   $('upcomingWeeks').innerHTML = [0,1,2].map(index => {
-    const monday = new Date(first); monday.setDate(monday.getDate()+index*7);
-    const lines = active.filter(o => activeAt(o,dateForDay(monday,o.loadWeekday || o.weekday)));
-    return `<article class="week-card"><h3>${index===0?'Semana actual':index===1?'Próxima semana':'En 2 semanas'}</h3><div class="week-date">${formatDate(monday.toISOString().slice(0,10))} al ${formatDate(new Date(monday.getTime()+6*86400000).toISOString().slice(0,10))}</div>${lines.length ? lines.map(o=>`<div class="week-line"><span>${esc(o.client)}<small>${esc(o.description || o.flower)}</small></span><strong>${o.boxes} × ${o.stems}</strong></div>`).join('') : '<div class="week-date">Sin órdenes activas</div>'}</article>`;
+    const cycleStart = new Date(first); cycleStart.setDate(cycleStart.getDate()+index*7);
+    const lines = active.filter(o => activeAt(o,dateForDay(cycleStart,o.loadWeekday || o.weekday)));
+    return `<article class="week-card"><h3>${index===0?'Semana actual':index===1?'Próxima semana':'En 2 semanas'}</h3><div class="week-date">${formatDate(cycleStart.toISOString().slice(0,10))} al ${formatDate(new Date(cycleStart.getTime()+6*86400000).toISOString().slice(0,10))}</div>${lines.length ? lines.map(o=>`<div class="week-line"><span>${esc(o.client)}<small>${esc(o.description || o.flower)}</small></span><strong>${o.boxes} × ${o.stems}</strong></div>`).join('') : '<div class="week-date">Sin órdenes activas</div>'}</article>`;
   }).join('');
 }
 function updateDerivedFields() {
@@ -98,7 +98,7 @@ async function executeOrders() {
   if (!pendingOrders.length) return alert('No hay órdenes activas listas para ejecutar.');
   const button = $('executeOrders');
   button.disabled = true;
-  button.textContent = 'Enviando a GitHub...';
+  button.textContent = 'Procesando en POSCO...';
   try {
     const response = await fetch('/api/execute-orders', {
       method: 'POST',
@@ -107,7 +107,12 @@ async function executeOrders() {
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || 'No se pudo iniciar GitHub Actions.');
-    alert('Ordenes enviadas a GitHub Actions. Revisa el workflow y descarga el artefacto con las capturas de POSCO. No se presionará Actualizar.');
+    if (Array.isArray(result.orders)) {
+      orders = result.orders.map(normalizeOrder);
+      saveOrders();
+      render();
+    }
+    alert(`POSCO actualizó las órdenes correctamente. El ciclo quedó registrado y las fechas avanzaron 7 días. Run: ${result.runId || 'completado'}`);
   } catch (error) {
     alert(`No se pudo ejecutar el bot: ${error.message}`);
   } finally {

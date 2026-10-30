@@ -22,6 +22,26 @@ const dateMinusDays = (value, days) => {
   date.setUTCDate(date.getUTCDate() - days);
   return date.toISOString().slice(0, 10);
 };
+const datePlusDays = (value, days) => {
+  const date = new Date(`${value}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+};
+
+function advanceProcessedOrders(sourceOrders, processedAt) {
+  return sourceOrders.map((order) => {
+    if (order.active === false || !order.startDate) return order;
+    const previousLoadDate = order.startDate;
+    const nextLoadDate = datePlusDays(previousLoadDate, 7);
+    return {
+      ...order,
+      startDate: nextLoadDate,
+      orderNo: `${esc(order.client)} - ${nextLoadDate.split('-').reverse().join('/')}`,
+      lastProcessedLoadDate: previousLoadDate,
+      lastProcessedAt: processedAt
+    };
+  });
+}
 
 function buildWorkbook(orders) {
   const workbook = XLSX.readFile(templatePath, { cellStyles: true, cellDates: true });
@@ -151,7 +171,27 @@ try {
   await uploadButton.click();
   await page.waitForTimeout(8000);
   await screenshot(page, '04-revision-posco.png');
-  console.log('POSCO quedó en revisión. No se pulsó Actualizar.');
+
+  const updateButton = page.getByRole('button', { name: 'Actualizar', exact: true });
+  await updateButton.waitFor({ state: 'visible', timeout: 30000 });
+  const updateEnabledUntil = Date.now() + 30000;
+  while (!(await updateButton.isEnabled())) {
+    if (Date.now() >= updateEnabledUntil) throw new Error('El botón Actualizar no se habilitó en POSCO.');
+    await page.waitForTimeout(250);
+  }
+  await updateButton.click();
+  await page.getByText('Ordenes Actualizadas', { exact: true }).waitFor({ state: 'visible', timeout: 120000 });
+  await screenshot(page, '05-actualizado-posco.png');
+
+  const processedAt = new Date().toISOString();
+  const advancedOrders = advanceProcessedOrders(orders, processedAt);
+  await writeFile(ordersPath, `${JSON.stringify(advancedOrders, null, 2)}\n`);
+  await writeFile(resolve(root, 'execution-log.json'), `${JSON.stringify({
+    processedAt,
+    loadDates: orders.filter((order) => order.active !== false && order.startDate).map((order) => order.startDate),
+    workflowRun: process.env.GITHUB_RUN_ID || null
+  }, null, 2)}\n`);
+  console.log(`POSCO actualizó las órdenes. Ciclo registrado y fechas avanzadas ${orders.length ? '7 días' : ''}.`);
 } finally {
   await browser.close();
 }
