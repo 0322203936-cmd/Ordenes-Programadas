@@ -19,6 +19,11 @@ jobs:
     env:
       POSCO_USER: ${{ secrets.POSCO_USER }}
       POSCO_PASSWORD: ${{ secrets.POSCO_PASSWORD }}
+      SHAREPOINT_TENANT_ID: ${{ secrets.SHAREPOINT_TENANT_ID || secrets.GRAPH_TENANT_ID }}
+      SHAREPOINT_CLIENT_ID: ${{ secrets.SHAREPOINT_CLIENT_ID || secrets.GRAPH_CLIENT_ID }}
+      SHAREPOINT_CLIENT_SECRET: ${{ secrets.SHAREPOINT_CLIENT_SECRET || secrets.GRAPH_CLIENT_SECRET }}
+      POSCO_ORDER_SENDER: noreply@cfbc.co
+      POSCO_ORDER_RECIPIENTS: jesus.sandoval@cfbc.co;gaston.gutierrez@cfbc.co;Irene.Machain@Pacifica-farms.com;roberto.gomez@cfbc.co
       ORDERS_FILE: ${{ inputs.orders_file }}
     steps:
       - name: Descargar repositorio
@@ -46,6 +51,9 @@ jobs:
           git add orders.json execution-log.json
           git commit -m "Registra ordenes actualizadas en POSCO"
           git push origin HEAD:master
+
+      - name: Enviar correo de actualización POSCO
+        run: node scripts/send-posco-email.mjs
 
       - name: Guardar archivo y capturas de revisión
         if: always()
