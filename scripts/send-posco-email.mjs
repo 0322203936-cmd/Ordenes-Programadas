@@ -91,7 +91,7 @@ const body = `<p>Hola equipo,</p>`
   + `• Load Dates procesadas: <strong>${htmlEscape(loadDates)}</strong><br>`
   + `• Órdenes cargadas: <strong>${activeOrders.length}</strong><br>`
   + '• Estado: <strong>Actualizado correctamente</strong></p>'
-  + '<p>El siguiente ciclo quedó programado automáticamente y el registro se actualizó para evitar duplicados.</p>'
+  + '<p>El siguiente ciclo quedó programado.</p>'
   + '<p>Saludos.</p>';
 
 const payload = {
