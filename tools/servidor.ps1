@@ -2,8 +2,8 @@
 # scheduled task "Ordenes Servidor", see tools/instalar_arranque.ps1):
 #   * starts node server.mjs and starts it again if it stops
 #   * every 2 minutes looks at GitHub (master); when the CODE changed: git pull, npm install if the
-#     libraries changed, restart. Commits that only touch orders.json (made by "Ejecutar órdenes"
-#     and the POSCO workflow) are left to the app itself, so a running execution is never cut.
+#     libraries changed, restart. Commits that only touch orders.json / execution-log.json (made by
+#     "Ejecutar órdenes" and the POSCO workflow) are left to the app itself, so a running execution is never cut.
 #   * data\.apagar (tools/apagar.ps1) stops the server and this loop
 # Logs: logs\servidor.log (this loop), logs\server.out.log / server.err.log (the server)
 $ErrorActionPreference = 'Continue'
@@ -63,7 +63,7 @@ while ($true) {
     git fetch -q origin $Branch 2>&1 | Out-Null
     if ($LASTEXITCODE -ne 0) { continue }
     $changed = @(git diff --name-only HEAD "origin/$Branch")
-    $code = @($changed | Where-Object { $_ -and $_ -ne 'orders.json' })
+    $code = @($changed | Where-Object { $_ -and $_ -notin @('orders.json', 'execution-log.json') })
     if ($code.Count -gt 0 -and (git rev-list --count "HEAD..origin/$Branch") -gt 0) {
       Log "Actualización encontrada: $(git log --oneline -1 "origin/$Branch")"
       Stop-App $app
