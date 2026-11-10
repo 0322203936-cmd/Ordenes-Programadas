@@ -19,7 +19,13 @@
     "endDate": "",
     "active": true,
     "lastProcessedLoadDate": "2026-11-13",
-    "lastProcessedAt": "2026-11-03T15:22:24.059Z"
+    "lastProcessedAt": "2026-11-03T15:22:24.059Z",
+    "processedHistory": [
+      {
+        "loadDate": "2026-11-13",
+        "at": "2026-11-03T15:22:24.059Z"
+      }
+    ]
   },
   {
     "id": "003edc88-4289-4164-9fae-af78d33b16ff",
@@ -41,7 +47,13 @@
     "endDate": "",
     "active": true,
     "lastProcessedLoadDate": "2026-11-13",
-    "lastProcessedAt": "2026-11-03T15:22:24.059Z"
+    "lastProcessedAt": "2026-11-03T15:22:24.059Z",
+    "processedHistory": [
+      {
+        "loadDate": "2026-11-13",
+        "at": "2026-11-03T15:22:24.059Z"
+      }
+    ]
   },
   {
     "id": "9cc91d50-fb7b-4740-a743-e780ea2ec06e",
@@ -63,7 +75,13 @@
     "endDate": "",
     "active": true,
     "lastProcessedLoadDate": "2026-11-13",
-    "lastProcessedAt": "2026-11-03T15:22:24.059Z"
+    "lastProcessedAt": "2026-11-03T15:22:24.059Z",
+    "processedHistory": [
+      {
+        "loadDate": "2026-11-13",
+        "at": "2026-11-03T15:22:24.059Z"
+      }
+    ]
   },
   {
     "id": "e9b48a6a-9871-4c23-8fbb-b98a7e10f7b7",
@@ -85,7 +103,13 @@
     "endDate": "",
     "active": true,
     "lastProcessedLoadDate": "2026-11-13",
-    "lastProcessedAt": "2026-11-03T15:22:24.059Z"
+    "lastProcessedAt": "2026-11-03T15:22:24.059Z",
+    "processedHistory": [
+      {
+        "loadDate": "2026-11-13",
+        "at": "2026-11-03T15:22:24.059Z"
+      }
+    ]
   },
   {
     "id": "ec65b7da-e4bc-4fc6-8cdd-98d2d8a2d4a4",
@@ -107,7 +131,13 @@
     "endDate": "",
     "active": true,
     "lastProcessedLoadDate": "2026-11-16",
-    "lastProcessedAt": "2026-11-03T15:22:24.059Z"
+    "lastProcessedAt": "2026-11-03T15:22:24.059Z",
+    "processedHistory": [
+      {
+        "loadDate": "2026-11-16",
+        "at": "2026-11-03T15:22:24.059Z"
+      }
+    ]
   },
   {
     "id": "6e33ea33-460e-4145-9ad1-70e0eb1203e2",
@@ -129,6 +159,12 @@
     "endDate": "",
     "active": true,
     "lastProcessedLoadDate": "2026-11-13",
-    "lastProcessedAt": "2026-11-03T15:22:24.059Z"
+    "lastProcessedAt": "2026-11-03T15:22:24.059Z",
+    "processedHistory": [
+      {
+        "loadDate": "2026-11-13",
+        "at": "2026-11-03T15:22:24.059Z"
+      }
+    ]
   }
 ]
