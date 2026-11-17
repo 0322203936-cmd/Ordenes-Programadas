@@ -203,6 +203,7 @@ $('orderForm').addEventListener('submit', (event) => {
   const data = {
     orderId:$('orderId').value,
     client:$('client').value,
+    customer:$('customer').value,
     description:$('description').value,
     boxes:$('boxes').value,
     pack:$('pack').value,
@@ -216,7 +217,7 @@ $('orderForm').addEventListener('submit', (event) => {
   const boxes = Number(data.boxes), stems = Number(data.stems);
   if (!Number.isInteger(boxes) || boxes < 1 || !Number.isInteger(stems) || stems < 1) return alert('Cajas y Stems deben ser números enteros mayores que cero.');
   if (data.endDate && data.endDate < data.startDate) return alert('La fecha final no puede ser anterior a la fecha de inicio.');
-  const order = { id:data.orderId || crypto.randomUUID(), distributor:DISTRIBUTOR, client:data.client.trim(), customer:'WHOLESALE', description:data.description.trim(), orderNo:buildOrderNo(data.client.trim(), data.startDate), executionWeekday:data.executionWeekday, loadWeekday:data.loadWeekday, weekday:data.loadWeekday, flower:data.flower.trim(), color:'', boxes, pack:data.pack.trim(), stems, boxType:'', startDate:data.startDate, endDate:data.endDate, active:$('active').checked };
+  const order = { id:data.orderId || crypto.randomUUID(), distributor:DISTRIBUTOR, client:data.client.trim(), customer:data.customer.trim() || 'WHOLESALE', description:data.description.trim(), orderNo:buildOrderNo(data.client.trim(), data.startDate), executionWeekday:data.executionWeekday, loadWeekday:data.loadWeekday, weekday:data.loadWeekday, flower:data.flower.trim(), color:'', boxes, pack:data.pack.trim(), stems, boxType:'', startDate:data.startDate, endDate:data.endDate, active:$('active').checked };
   const index=orders.findIndex(o=>o.id===order.id); if(index>=0) orders[index]=order; else orders.push(order);
   saveOrders(); $('orderDialog').close(); render();
 });

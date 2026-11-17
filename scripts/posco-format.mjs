@@ -19,7 +19,7 @@ export function buildWorkbook(orders, templatePath) {
   );
   const rows = orders.filter((order) => order.active !== false && order.startDate).map((order) => [
     'PACIFICA PRODUCE FARMS',
-    'WHOLESALE',
+    esc(order.customer) || 'WHOLESALE',
     esc(order.description),
     esc(order.orderNo) || `${esc(order.client)} - ${order.startDate.split('-').reverse().join('/')}`,
     '',
