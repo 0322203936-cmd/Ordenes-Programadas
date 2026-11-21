@@ -5,27 +5,19 @@
     "client": "Oberer´s Flowers Inc",
     "customer": "WHOLESALE",
     "description": "WS Matricaria White Daysi 10ST 15PK",
-    "orderNo": "Oberer´s Flowers Inc - 27/11/2026",
+    "orderNo": "Oberer´s Flowers Inc - 26/11/2026",
     "executionWeekday": "Martes",
-    "loadWeekday": "Viernes",
-    "weekday": "Viernes",
+    "loadWeekday": "Jueves",
+    "weekday": "Jueves",
     "flower": "MATRICARIA",
     "color": "",
     "boxes": 1,
     "pack": "15",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-27",
+    "startDate": "2026-11-26",
     "endDate": "",
-    "active": true,
-    "lastProcessedLoadDate": "2026-11-20",
-    "lastProcessedAt": "2026-11-10T16:08:35.773Z",
-    "processedHistory": [
-      {
-        "loadDate": "2026-11-13",
-        "at": "2026-11-03T15:22:24.059Z"
-      }
-    ]
+    "active": true
   },
   {
     "id": "003edc88-4289-4164-9fae-af78d33b16ff",
@@ -33,138 +25,58 @@
     "client": "Dr. Delphinium",
     "customer": "WHOLESALE",
     "description": "WS SNAPDRAGON BURGANDY 10 ST PK 15",
-    "orderNo": "Dr. Delphinium - 27/11/2026",
+    "orderNo": "Dr. Delphinium - 26/11/2026",
     "executionWeekday": "Martes",
-    "loadWeekday": "Viernes",
-    "weekday": "Viernes",
+    "loadWeekday": "Jueves",
+    "weekday": "Jueves",
     "flower": "SNAPDRAGON",
     "color": "",
     "boxes": 3,
     "pack": "15",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-27",
+    "startDate": "2026-11-26",
     "endDate": "",
-    "active": true,
-    "lastProcessedLoadDate": "2026-11-20",
-    "lastProcessedAt": "2026-11-10T16:08:35.773Z",
-    "processedHistory": [
-      {
-        "loadDate": "2026-11-13",
-        "at": "2026-11-03T15:22:24.059Z"
-      }
-    ]
+    "active": true
   },
   {
-    "id": "9cc91d50-fb7b-4740-a743-e780ea2ec06e",
+    "id": "52f9e1dd-438c-433a-82ad-db1a69c8909a",
     "distributor": "PACIFICA PRODUCE FARMS",
-    "client": "Dr. Delphinium",
-    "customer": "WHOLESALE",
-    "description": "SAFFLOWER ORANGE 10st pk10",
-    "orderNo": "Dr. Delphinium - 27/11/2026",
+    "client": "Americana Farms",
+    "customer": "AMERICANA FARMS VISTA",
+    "description": "WHITE SELECT FEVERFEW DAISY X 12 BUNCH",
+    "orderNo": "Americana Farms - 28/11/2026",
     "executionWeekday": "Martes",
-    "loadWeekday": "Viernes",
-    "weekday": "Viernes",
-    "flower": "SAFFLOWER",
-    "color": "",
-    "boxes": 2,
-    "pack": "10",
-    "stems": 10,
-    "boxType": "",
-    "startDate": "2026-11-27",
-    "endDate": "",
-    "active": true,
-    "lastProcessedLoadDate": "2026-11-20",
-    "lastProcessedAt": "2026-11-10T16:08:35.773Z",
-    "processedHistory": [
-      {
-        "loadDate": "2026-11-13",
-        "at": "2026-11-03T15:22:24.059Z"
-      }
-    ]
-  },
-  {
-    "id": "e9b48a6a-9871-4c23-8fbb-b98a7e10f7b7",
-    "distributor": "PACIFICA PRODUCE FARMS",
-    "client": "Dr. Delphinium",
-    "customer": "WHOLESALE",
-    "description": "WS MARIGOLD ORANGE 5ST PK10",
-    "orderNo": "Dr. Delphinium - 27/11/2026",
-    "executionWeekday": "Martes",
-    "loadWeekday": "Viernes",
-    "weekday": "Viernes",
-    "flower": "MARIGOLD",
-    "color": "",
-    "boxes": 3,
-    "pack": "10",
-    "stems": 5,
-    "boxType": "",
-    "startDate": "2026-11-27",
-    "endDate": "",
-    "active": true,
-    "lastProcessedLoadDate": "2026-11-20",
-    "lastProcessedAt": "2026-11-10T16:08:35.773Z",
-    "processedHistory": [
-      {
-        "loadDate": "2026-11-13",
-        "at": "2026-11-03T15:22:24.059Z"
-      }
-    ]
-  },
-  {
-    "id": "ec65b7da-e4bc-4fc6-8cdd-98d2d8a2d4a4",
-    "distributor": "PACIFICA PRODUCE FARMS",
-    "client": "Allen Flowers and Plants - FTD",
-    "customer": "WHOLESALE",
-    "description": "WS Matricaria White Daysi 10ST 15PK",
-    "orderNo": "Allen Flowers and Plants - FTD - 30/11/2026",
-    "executionWeekday": "Martes",
-    "loadWeekday": "Lunes",
-    "weekday": "Lunes",
+    "loadWeekday": "Sábado",
+    "weekday": "Sábado",
     "flower": "MATRICARIA",
     "color": "",
     "boxes": 2,
-    "pack": "15",
+    "pack": "12",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-30",
+    "startDate": "2026-11-28",
     "endDate": "",
-    "active": true,
-    "lastProcessedLoadDate": "2026-11-23",
-    "lastProcessedAt": "2026-11-10T16:08:35.773Z",
-    "processedHistory": [
-      {
-        "loadDate": "2026-11-16",
-        "at": "2026-11-03T15:22:24.059Z"
-      }
-    ]
+    "active": true
   },
   {
-    "id": "6e33ea33-460e-4145-9ad1-70e0eb1203e2",
+    "id": "c367c292-b980-4f79-9225-fbf28121f0ef",
     "distributor": "PACIFICA PRODUCE FARMS",
-    "client": "Allen Flowers and Plants - FTD",
-    "customer": "WHOLESALE",
-    "description": "WS Matricaria White Daysi 10ST 15PK",
-    "orderNo": "Allen Flowers and Plants - FTD - 27/11/2026",
+    "client": "Americana Farms",
+    "customer": "AMERICANA FARMS VISTA",
+    "description": "25PK WHITE DAISY FEVERFEW",
+    "orderNo": "Americana Farms - 28/11/2026",
     "executionWeekday": "Martes",
-    "loadWeekday": "Viernes",
-    "weekday": "Viernes",
+    "loadWeekday": "Sábado",
+    "weekday": "Sábado",
     "flower": "MATRICARIA",
     "color": "",
-    "boxes": 3,
-    "pack": "15",
+    "boxes": 1,
+    "pack": "25",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-27",
+    "startDate": "2026-11-28",
     "endDate": "",
-    "active": true,
-    "lastProcessedLoadDate": "2026-11-20",
-    "lastProcessedAt": "2026-11-10T16:08:35.773Z",
-    "processedHistory": [
-      {
-        "loadDate": "2026-11-13",
-        "at": "2026-11-03T15:22:24.059Z"
-      }
-    ]
+    "active": true
   }
 ]
