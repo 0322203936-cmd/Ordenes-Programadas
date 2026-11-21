@@ -29,12 +29,17 @@ async function syncLatestOrders() {
   await execFileAsync(git, ['pull', '--rebase', 'origin', 'master'], { cwd: root });
 }
 
+// An order is a duplicate only if POSCO really got that load already: the same load date (or a later one),
+// or another load of the same order in the same week (Tuesday..Monday). Just having an earlier date than
+// the bot's list is not enough: moving a load from Friday 27 to Thursday 26 is a valid change.
 async function rejectProcessedDuplicates(incomingOrders) {
   const current = JSON.parse(await readFile(join(root, 'orders.json'), 'utf8'));
   const currentById = new Map(current.map((order) => [order.id, order]));
   const duplicates = incomingOrders.filter((order) => {
     const stored = currentById.get(order.id);
-    return stored && order.startDate && stored.startDate && stored.startDate > order.startDate;
+    if (!stored || !order.startDate) return false;
+    const loaded = [stored.lastProcessedLoadDate, ...(stored.processedHistory || []).map((entry) => entry.loadDate)].filter(Boolean);
+    return loaded.some((loadDate) => loadDate >= order.startDate || cycleStart(loadDate) === cycleStart(order.startDate));
   });
   if (duplicates.length) {
     throw new Error(`Estas órdenes ya fueron procesadas para ${duplicates.map((order) => order.client || order.id).join(', ')}. Recarga la aplicación antes de ejecutar nuevamente.`);
