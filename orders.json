@@ -5,7 +5,7 @@
     "client": "Oberer´s Flowers Inc",
     "customer": "WHOLESALE",
     "description": "WS Matricaria White Daysi 10ST 15PK",
-    "orderNo": "Oberer´s Flowers Inc - 26/11/2026",
+    "orderNo": "Oberer´s Flowers Inc - 03/12/2026",
     "executionWeekday": "Martes",
     "loadWeekday": "Jueves",
     "weekday": "Jueves",
@@ -15,9 +15,11 @@
     "pack": "15",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-26",
+    "startDate": "2026-12-03",
     "endDate": "",
-    "active": true
+    "active": true,
+    "lastProcessedLoadDate": "2026-11-26",
+    "lastProcessedAt": "2026-11-21T20:42:18.469Z"
   },
   {
     "id": "003edc88-4289-4164-9fae-af78d33b16ff",
@@ -25,7 +27,7 @@
     "client": "Dr. Delphinium",
     "customer": "WHOLESALE",
     "description": "WS SNAPDRAGON BURGANDY 10 ST PK 15",
-    "orderNo": "Dr. Delphinium - 26/11/2026",
+    "orderNo": "Dr. Delphinium - 03/12/2026",
     "executionWeekday": "Martes",
     "loadWeekday": "Jueves",
     "weekday": "Jueves",
@@ -35,9 +37,11 @@
     "pack": "15",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-26",
+    "startDate": "2026-12-03",
     "endDate": "",
-    "active": true
+    "active": true,
+    "lastProcessedLoadDate": "2026-11-26",
+    "lastProcessedAt": "2026-11-21T20:42:18.469Z"
   },
   {
     "id": "52f9e1dd-438c-433a-82ad-db1a69c8909a",
@@ -45,7 +49,7 @@
     "client": "Americana Farms",
     "customer": "AMERICANA FARMS VISTA",
     "description": "WHITE SELECT FEVERFEW DAISY X 12 BUNCH",
-    "orderNo": "Americana Farms - 28/11/2026",
+    "orderNo": "Americana Farms - 05/12/2026",
     "executionWeekday": "Martes",
     "loadWeekday": "Sábado",
     "weekday": "Sábado",
@@ -55,9 +59,11 @@
     "pack": "12",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-28",
+    "startDate": "2026-12-05",
     "endDate": "",
-    "active": true
+    "active": true,
+    "lastProcessedLoadDate": "2026-11-28",
+    "lastProcessedAt": "2026-11-21T20:42:18.469Z"
   },
   {
     "id": "c367c292-b980-4f79-9225-fbf28121f0ef",
@@ -65,7 +71,7 @@
     "client": "Americana Farms",
     "customer": "AMERICANA FARMS VISTA",
     "description": "25PK WHITE DAISY FEVERFEW",
-    "orderNo": "Americana Farms - 28/11/2026",
+    "orderNo": "Americana Farms - 05/12/2026",
     "executionWeekday": "Martes",
     "loadWeekday": "Sábado",
     "weekday": "Sábado",
@@ -75,8 +81,10 @@
     "pack": "25",
     "stems": 10,
     "boxType": "",
-    "startDate": "2026-11-28",
+    "startDate": "2026-12-05",
     "endDate": "",
-    "active": true
+    "active": true,
+    "lastProcessedLoadDate": "2026-11-28",
+    "lastProcessedAt": "2026-11-21T20:42:18.469Z"
   }
 ]
