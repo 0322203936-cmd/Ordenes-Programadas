@@ -19,7 +19,13 @@
     "endDate": "",
     "active": true,
     "lastProcessedLoadDate": "2026-11-26",
-    "lastProcessedAt": "2026-11-21T20:42:18.469Z"
+    "lastProcessedAt": "2026-11-21T20:42:18.469Z",
+    "processedHistory": [
+      {
+        "loadDate": "2026-11-26",
+        "at": "2026-11-21T20:42:18.469Z"
+      }
+    ]
   },
   {
     "id": "003edc88-4289-4164-9fae-af78d33b16ff",
@@ -41,7 +47,13 @@
     "endDate": "",
     "active": true,
     "lastProcessedLoadDate": "2026-11-26",
-    "lastProcessedAt": "2026-11-21T20:42:18.469Z"
+    "lastProcessedAt": "2026-11-21T20:42:18.469Z",
+    "processedHistory": [
+      {
+        "loadDate": "2026-11-26",
+        "at": "2026-11-21T20:42:18.469Z"
+      }
+    ]
   },
   {
     "id": "52f9e1dd-438c-433a-82ad-db1a69c8909a",
@@ -63,7 +75,13 @@
     "endDate": "",
     "active": true,
     "lastProcessedLoadDate": "2026-11-28",
-    "lastProcessedAt": "2026-11-21T20:42:18.469Z"
+    "lastProcessedAt": "2026-11-21T20:42:18.469Z",
+    "processedHistory": [
+      {
+        "loadDate": "2026-11-28",
+        "at": "2026-11-21T20:42:18.469Z"
+      }
+    ]
   },
   {
     "id": "c367c292-b980-4f79-9225-fbf28121f0ef",
@@ -85,6 +103,12 @@
     "endDate": "",
     "active": true,
     "lastProcessedLoadDate": "2026-11-28",
-    "lastProcessedAt": "2026-11-21T20:42:18.469Z"
+    "lastProcessedAt": "2026-11-21T20:42:18.469Z",
+    "processedHistory": [
+      {
+        "loadDate": "2026-11-28",
+        "at": "2026-11-21T20:42:18.469Z"
+      }
+    ]
   }
 ]
